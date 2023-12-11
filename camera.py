@@ -1,51 +1,49 @@
-import cv2
-import numpy as np
-from mrcnn import utils
-from mrcnn import model as modellib
-from mrcnn.config import Config
+import tkinter as tk
+from PIL import Image, ImageTk
 
-# 設定Mask R-CNN的配置
-class InferenceConfig(Config):
-    NAME = "foreground_background"
-    GPU_COUNT = 1
-    IMAGES_PER_GPU = 1
-    NUM_CLASSES = 2  # 前景和背景
+class ImageSwitcherApp:
+    def __init__(self, master):
+        self.master = master
+        self.master.title("Image Switcher")
 
-config = InferenceConfig()
+        self.images = [
+            Image.open("./linear_interpolation/img/2-1.jpg"),  # 替换为你的图片路径
+            Image.open("./linear_interpolation/img/2-2.jpg"),
+            Image.open("./linear_interpolation/img/2-3.jpg")
+        ]
 
-# 建立Mask R-CNN模型
-model = modellib.MaskRCNN(mode="inference", config=config, model_dir='./')
+        self.current_image_index = 0
 
-# 載入預訓練的權重（COCO資料集）
-model.load_weights('mask_rcnn_coco.h5', by_name=True)
+        # 调整图像大小，适应屏幕
+        screen_width = self.master.winfo_screenwidth()
+        screen_height = self.master.winfo_screenheight()
 
-# 初始化相機
-cap = cv2.VideoCapture(0)
+        for i, img in enumerate(self.images):
+            self.images[i] = self.resize_image(img, screen_width, screen_height)
 
-while True:
-    # 讀取當前幀
-    ret, frame = cap.read()
+        self.displayed_image = ImageTk.PhotoImage(self.images[self.current_image_index])
 
-    # 預測Mask R-CNN結果
-    results = model.detect([frame], verbose=0)
-    r = results[0]
+        self.canvas = tk.Canvas(self.master, width=screen_width, height=screen_height)
+        self.canvas.pack()
 
-    # 提取前景區域
-    foreground_mask = r['masks'][:, :, 0]
-    foreground = frame.copy()
-    foreground[foreground_mask == 0] = 0
+        self.canvas.create_image(0, 0, anchor=tk.NW, image=self.displayed_image)
 
-    # 提取背景區域
-    background = frame.copy()
-    background[foreground_mask > 0] = 0
+        # 设置鼠标点击事件
+        self.canvas.bind("<Button-1>", self.switch_image)
 
-    # 顯示結果
-    cv2.imshow('Foreground', foreground)
-    cv2.imshow('Background', background)
+    def resize_image(self, img, target_width, target_height):
+        img.thumbnail((target_width, target_height))
+        return img
 
-    # 按 'q' 鍵退出迴圈
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    def switch_image(self, event):
+        # 切换到下一张图
+        self.current_image_index = (self.current_image_index + 1) % len(self.images)
+        self.displayed_image = ImageTk.PhotoImage(self.images[self.current_image_index])
 
-cap.release()
-cv2.destroyAllWindows()
+        # 更新Canvas上的图像
+        self.canvas.create_image(0, 0, anchor=tk.NW, image=self.displayed_image)
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = ImageSwitcherApp(root)
+    root.mainloop()
