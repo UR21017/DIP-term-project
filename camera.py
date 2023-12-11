@@ -14,12 +14,12 @@ class ImageSwitcherApp:
 
         self.current_image_index = 0
 
-        # 调整图像大小，适应屏幕
+        # 调整图像大小并裁剪，适应屏幕
         screen_width = self.master.winfo_screenwidth()
         screen_height = self.master.winfo_screenheight()
 
         for i, img in enumerate(self.images):
-            self.images[i] = self.resize_image(img, screen_width, screen_height)
+            self.images[i] = self.resize_and_crop_image(img, screen_width, screen_height)
 
         self.displayed_image = ImageTk.PhotoImage(self.images[self.current_image_index])
 
@@ -31,9 +31,20 @@ class ImageSwitcherApp:
         # 设置鼠标点击事件
         self.canvas.bind("<Button-1>", self.switch_image)
 
-    def resize_image(self, img, target_width, target_height):
+    def resize_and_crop_image(self, img, target_width, target_height):
+        # 调整图像大小
         img.thumbnail((target_width, target_height))
-        return img
+        
+        # 计算裁剪框的位置
+        left_margin = (img.width - target_width) / 2
+        top_margin = (img.height - target_height) / 2
+        right_margin = (img.width + target_width) / 2
+        bottom_margin = (img.height + target_height) / 2
+
+        # 裁剪图像
+        img_cropped = img.crop((left_margin, top_margin, right_margin, bottom_margin))
+        
+        return img_cropped
 
     def switch_image(self, event):
         # 切换到下一张图
