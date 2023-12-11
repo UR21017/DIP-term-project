@@ -47,7 +47,7 @@ def SIFT(foreground, background):
         pts = np.float32([[0,0], [0, h-1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
         dst = cv2.perspectiveTransform(pts, M)
     
-        background = cv2.polylines(background, [np.int32(dst)], True, 255, 3, cv2.LINE_AA)
+        # background = cv2.polylines(background, [np.int32(dst)], True, 255, 3, cv2.LINE_AA)
        
        # 將background 沿著polylines切割
         mask = np.zeros_like(background)
@@ -57,10 +57,15 @@ def SIFT(foreground, background):
         pts_rect = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
         M_inv = cv2.getPerspectiveTransform(dst, pts_rect)
         background = cv2.warpPerspective(background_crop, M_inv, (w, h))
+        background_cut = cv2.warpPerspective(background_crop, M, (w, h))
         foreground = foreground
         
         cv2.imshow("background", background)
         cv2.imshow("foreground", foreground)
+
+        cv2.imwrite("./result/background_cut.jpg", background_cut)
+        cv2.imwrite("./result/background.jpg", background)
+        cv2.imwrite("./result/foreground.jpg", foreground)
 
         
 
@@ -83,7 +88,49 @@ def SIFT(foreground, background):
 
     return result
 
-result = SIFT(foreground, background)
+def camera():
+    cap = cv2.VideoCapture(0)  # 0 corresponds to the default camera (you can change it if you have multiple cameras)
+
+    while True:
+        ret, frame = cap.read()
+
+        if not ret:
+            print("Failed to capture frame")
+            break
+
+        # Convert the frame to grayscale
+        frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        # Use Canny edge detection to find edges in the frame
+        edges = cv2.Canny(frame_gray, 50, 150)
+
+        # Threshold for determining near and far scenes (adjust as needed)
+        threshold = 20000
+
+        # Estimate depth based on the number of edges
+        if np.sum(edges) > threshold:
+            # Far scene
+            background = frame_gray
+        else:
+            # Near scene
+            foreground = frame_gray
+
+        # Call the SIFT function with the current near and far scenes
+        result = SIFT(foreground, background)
+
+        # Display the processed frame
+        cv2.imshow("Processed Frame", result)
+
+        # Break the loop when 'q' is pressed
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    # Release the camera and close all windows
+    cap.release()
+    cv2.destroyAllWindows()
+
+
+result = SIFT(foreground=foreground, background=background)
 
 # # Stereo Vision Depth Estimation
 # stereo = cv2.StereoSGBM_create(numDisparities=16, blockSize=15)
