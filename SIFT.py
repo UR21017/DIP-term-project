@@ -1,12 +1,26 @@
-import cv2
-import numpy as np 
 import matplotlib.pyplot as plt
+import numpy as np
+import cv2
+
+from matplotlib.backend_bases import MouseButton
+
+import glob
+
+# 图片路径列表
+folder_path = "./linear_interpolation/img/"
+image_paths = glob.glob(f"{folder_path}*.jpg")
+
+# image_paths = ["./linear_interpolation/img2/1.jpg", "./linear_interpolation/img2/2.jpg", "./linear_interpolation/img2/3.jpg", "./linear_interpolation/img2/4.jpg", "./linear_interpolation/img2/5.jpg"]
+current_image_index = 0  # 当前显示的图片索引
+
+
+
 
 MIN_MATCH_COUNT = 10
 
-foreground_path = "./linear_interpolation/img/2-1.jpg"
+foreground_path = "./linear_interpolation/img2/1.jpg"
 # middleground_path = "./linear_interpolation/img/2-2.jpg"
-background_path = "./linear_interpolation/img/2-3.jpg"
+background_path = "./linear_interpolation/img2/2.jpg"
 
 foreground = cv2.imread(foreground_path, cv2.IMREAD_GRAYSCALE)
 # middleground = cv2.imread(middleground_path)
@@ -46,8 +60,6 @@ def SIFT(foreground, background):
         h, w = foreground.shape
         pts = np.float32([[0,0], [0, h-1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
         dst = cv2.perspectiveTransform(pts, M)
-    
-        # background = cv2.polylines(background, [np.int32(dst)], True, 255, 3, cv2.LINE_AA)
        
        # 將background 沿著polylines切割
         mask = np.zeros_like(background)
@@ -57,18 +69,8 @@ def SIFT(foreground, background):
         pts_rect = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
         M_inv = cv2.getPerspectiveTransform(dst, pts_rect)
         background = cv2.warpPerspective(background_crop, M_inv, (w, h))
-        background_cut = cv2.warpPerspective(background_crop, M, (w, h))
-        foreground = foreground
+        foreground = foreground 
         
-        cv2.imshow("background", background)
-        cv2.imshow("foreground", foreground)
-
-        cv2.imwrite("./result/background_cut.jpg", background_cut)
-        cv2.imwrite("./result/background.jpg", background)
-        cv2.imwrite("./result/foreground.jpg", foreground)
-
-        
-
     else:
         print("Not enough matches are found - {}/{}".format(len(good), MIN_MATCH_COUNT))
         matchesMask = None
@@ -81,68 +83,45 @@ def SIFT(foreground, background):
 
     result = cv2.drawMatches(foreground, kp1, background, kp2, good, None, **draw_params)
 
-    plt.imshow(result, 'gray'), plt.show()
-
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    return result
-
-def camera():
-    cap = cv2.VideoCapture(0)  # 0 corresponds to the default camera (you can change it if you have multiple cameras)
-
-    while True:
-        ret, frame = cap.read()
-
-        if not ret:
-            print("Failed to capture frame")
-            break
-
-        # Convert the frame to grayscale
-        frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-        # Use Canny edge detection to find edges in the frame
-        edges = cv2.Canny(frame_gray, 50, 150)
-
-        # Threshold for determining near and far scenes (adjust as needed)
-        threshold = 20000
-
-        # Estimate depth based on the number of edges
-        if np.sum(edges) > threshold:
-            # Far scene
-            background = frame_gray
-        else:
-            # Near scene
-            foreground = frame_gray
-
-        # Call the SIFT function with the current near and far scenes
-        result = SIFT(foreground, background)
-
-        # Display the processed frame
-        cv2.imshow("Processed Frame", result)
-
-        # Break the loop when 'q' is pressed
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    # Release the camera and close all windows
-    cap.release()
-    cv2.destroyAllWindows()
+    return background
 
 
-result = SIFT(foreground=foreground, background=background)
 
-# # Stereo Vision Depth Estimation
-# stereo = cv2.StereoSGBM_create(numDisparities=16, blockSize=15)
-# disparity = stereo.compute(foreground, background)
 
-# # Normalize and apply color map to the disparity map
-# depth_map = cv2.normalize(disparity, None, 0, 255, cv2.NORM_MINMAX)
-# depth_map_colored = cv2.applyColorMap(depth_map.astype(np.uint8), cv2.COLORMAP_JET)
+def load_image(index):
+    # 加载图像并进行处理（例如，转换为灰度）
+    image_path = image_paths[index]
+    background = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    
+    foreground = cv2.imread(image_paths[0], cv2.IMREAD_GRAYSCALE)
+    
+    # processed_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
+    processed_image = SIFT(foreground,  background)
 
-# # Depth-based Blending
-# blurred_background = cv2.GaussianBlur(background, (15, 15), 0)
-# result = cv2.addWeighted(blurred_background, 0.7, depth_map_colored, 0.3, 0)
+    return processed_image
 
-# # Display the result
-# plt.imshow(result), plt.show()
+def on_click(event):
+    if event.button is MouseButton.LEFT:
+        global current_image_index
+
+        # 切换到下一张图片
+        current_image_index = (current_image_index + 1) % len(image_paths)
+
+        # 更新显示的图像
+        ax.clear()
+        ax.imshow(load_image(current_image_index), cmap='gray')  # 指定cmap为'gray'
+        ax.set_title(f"Image {current_image_index + 1}")
+
+        # 刷新图形
+        plt.draw()
+
+# 创建初始图形
+fig, ax = plt.subplots()
+ax.imshow(load_image(current_image_index), cmap='gray')  # 指定cmap为'gray'
+ax.set_title(f"Image {current_image_index + 1}")
+
+# 将鼠标点击事件连接到更新图像的函数
+plt.connect('button_press_event', on_click)
+
+# 显示图形
+plt.show()
