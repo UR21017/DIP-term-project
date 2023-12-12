@@ -7,9 +7,11 @@ class ImageSwitcherApp:
         self.master.title("Image Switcher")
 
         self.images = [
-            Image.open("./linear_interpolation/img/2-1.jpg"),  # 替换为你的图片路径
-            Image.open("./linear_interpolation/img/2-2.jpg"),
-            Image.open("./linear_interpolation/img/2-3.jpg")
+            Image.open("./linear_interpolation/img2/1.jpg"),  # 替换为你的图片路径
+            Image.open("./linear_interpolation/img2/2.jpg"),
+            Image.open("./linear_interpolation/img2/3.jpg"),
+            Image.open("./linear_interpolation/img2/4.jpg"),
+            Image.open("./linear_interpolation/img2/5.jpg")
         ]
 
         self.current_image_index = 0
