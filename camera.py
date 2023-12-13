@@ -7,9 +7,17 @@ class FocalStackRefocusing:
         self.images = [cv2.imread(path) for path in image_paths]
         self.image_index = 0
 
+<<<<<<< HEAD
         # 創建窗口並設置鼠標回調函數
         cv2.namedWindow("Image")
         cv2.setMouseCallback("Image", self.mouse_click)
+=======
+        self.images = [
+            Image.open("./linear_interpolation/img/2-1.jpg"),  # 替换为你的图片路径
+            Image.open("./linear_interpolation/img/2-2.jpg"),
+            Image.open("./linear_interpolation/img/2-3.jpg")
+        ]
+>>>>>>> 59f8fa51d7ca27372674bfdb38d56f5376a4c955
 
     def calculate_sharpness(self, image, point):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
