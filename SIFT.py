@@ -7,7 +7,7 @@ from matplotlib.backend_bases import MouseButton
 import glob
 
 # 图片路径列表
-folder_path = "./linear_interpolation/img/"
+folder_path = "./linear_interpolation/img2/"
 image_paths = glob.glob(f"{folder_path}*.jpg")
 
 # image_paths = ["./linear_interpolation/img2/1.jpg", "./linear_interpolation/img2/2.jpg", "./linear_interpolation/img2/3.jpg", "./linear_interpolation/img2/4.jpg", "./linear_interpolation/img2/5.jpg"]
