@@ -1,21 +1,16 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
-
 from matplotlib.backend_bases import MouseButton
-
 import glob
 
-# 图片路径列表
-folder_path = "./linear_interpolation/img2/"
+folder_path = "./images/"
 image_paths = glob.glob(f"{folder_path}*.jpg")
-current_image_index = 0  # 当前显示的图片索引
 
 
 MIN_MATCH_COUNT = 10
 
 def SIFT(foreground, background):
-
     sift = cv2.SIFT_create()
 
     kp1, des1 = sift.detectAndCompute(foreground, None)
@@ -24,9 +19,7 @@ def SIFT(foreground, background):
     FLANN_INDEX_KDTREE = 1
     index_params = dict(algorithm=FLANN_INDEX_KDTREE, tree = 5)
     search_params = dict(checks=50)
-
     flann = cv2.FlannBasedMatcher(index_params, search_params)
-
     matches = flann.knnMatch(des1, des2, k=2)
 
     good = []
@@ -37,7 +30,6 @@ def SIFT(foreground, background):
     if len(good) > MIN_MATCH_COUNT:
         src_pts = np.float32([kp1[m.queryIdx].pt for m in good]).reshape(-1, 1, 2)
         dst_pts = np.float32([kp2[m.trainIdx].pt for m in good]).reshape(-1, 1, 2)
-
         M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
         matchesMask = mask.ravel().tolist()
 
@@ -45,11 +37,9 @@ def SIFT(foreground, background):
         pts = np.float32([[0,0], [0, h-1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
         dst = cv2.perspectiveTransform(pts, M)
        
-       # 將background 沿著polylines切割
         mask = np.zeros_like(background)
         cv2.fillPoly(mask, [np.int32(dst)], 255)
         background_crop = cv2.bitwise_and(background, mask)
-
         pts_rect = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
         M_inv = cv2.getPerspectiveTransform(dst, pts_rect)
         background = cv2.warpPerspective(background_crop, M_inv, (w, h))
@@ -67,18 +57,14 @@ def SIFT(foreground, background):
 
     result = cv2.drawMatches(foreground, kp1, background, kp2, good, None, **draw_params)
 
-    return background
+    return cv2.cvtColor(background, cv2.COLOR_GRAY2BGR)
 
 
 
 
 def load_image(standand, targetImage):
-    # 加载图像并进行处理（例如，转换为灰度）
     foreground = cv2.imread(standand, cv2.IMREAD_GRAYSCALE)
     background = cv2.imread(targetImage, cv2.IMREAD_GRAYSCALE)
-    
-    
-    # processed_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
     processed_image = SIFT(foreground,  background)
 
     return processed_image
@@ -88,17 +74,12 @@ def calculate_image_quality(image):
 
 def find_best_focus_image(directory, click_x, click_y, window_size=50):
     best_quality = -1
-    best_image_path = ""
-
     for image in directory:
   
         x= max(0, int(click_x) - window_size)
         y = max(0,int(click_y) - window_size)
 
-        
-
         window = image[y:min(y + window_size * 2, image.shape[0]), x:min(x + window_size * 2, image.shape[1])]
-
         quality = calculate_image_quality(window)
 
         if quality > best_quality:
@@ -116,11 +97,9 @@ def on_click(event):
 
         best_image = find_best_focus_image(directory, click_x, click_y)
 
-        # 更新显示的图像
+
         ax.clear()
-        ax.imshow(best_image, cmap='gray')  # 指定cmap为'gray'
-        # ax.set_title(f"Image {current_image_index + 1}")
-        # 刷新图形
+        ax.imshow(best_image)  
         plt.draw()
 
 
@@ -133,14 +112,11 @@ for image_path in image_paths:
     # cv2.imshow("result",load_image(image_paths[0], image_path))
     # cv2.waitKey(0)
 
-# 创建初始图形
 fig, ax = plt.subplots()
-ax.imshow(directory[0], cmap='gray')  # 指定cmap为'gray'
+ax.imshow(directory[0]) 
 
-# 将鼠标点击事件连接到更新图像的函数
 plt.connect('button_press_event', on_click)
 
 manager = plt.get_current_fig_manager()
 manager.full_screen_toggle()
-# 显示图形
 plt.show()
