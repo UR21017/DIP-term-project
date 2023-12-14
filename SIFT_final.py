@@ -4,7 +4,7 @@ import cv2
 from matplotlib.backend_bases import MouseButton
 import glob
 
-folder_path = "./images/"
+folder_path = "./pictures/"
 image_paths = glob.glob(f"{folder_path}*.jpg")
 
 
@@ -31,41 +31,33 @@ def SIFT(foreground, background):
         src_pts = np.float32([kp1[m.queryIdx].pt for m in good]).reshape(-1, 1, 2)
         dst_pts = np.float32([kp2[m.trainIdx].pt for m in good]).reshape(-1, 1, 2)
         M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
-        matchesMask = mask.ravel().tolist()
+      
 
-        h, w = foreground.shape
+        h, w, c = foreground.shape
         pts = np.float32([[0,0], [0, h-1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
         dst = cv2.perspectiveTransform(pts, M)
        
         mask = np.zeros_like(background)
         cv2.fillPoly(mask, [np.int32(dst)], 255)
-        background_crop = cv2.bitwise_and(background, mask)
         pts_rect = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
         M_inv = cv2.getPerspectiveTransform(dst, pts_rect)
-        background = cv2.warpPerspective(background_crop, M_inv, (w, h))
-        foreground = foreground 
+        background = cv2.warpPerspective(background, M_inv, (w, h))
         
     else:
         print("Not enough matches are found - {}/{}".format(len(good), MIN_MATCH_COUNT))
         matchesMask = None
 
-    draw_params = dict(matchColor = (0,255,0), # draw matches in green color
-                    singlePointColor=None, 
-                    matchesMask=matchesMask,  # draw only inliers
-                    flags = 2)
-
-
-    result = cv2.drawMatches(foreground, kp1, background, kp2, good, None, **draw_params)
-
-    return cv2.cvtColor(background, cv2.COLOR_GRAY2BGR)
-
+    return background
 
 
 
 def load_image(standand, targetImage):
-    foreground = cv2.imread(standand, cv2.IMREAD_GRAYSCALE)
-    background = cv2.imread(targetImage, cv2.IMREAD_GRAYSCALE)
+    foreground = cv2.imread(standand)
+    background = cv2.imread(targetImage)
+    foreground = cv2.cvtColor(foreground, cv2.COLOR_BGR2RGB)
+    background = cv2.cvtColor(background, cv2.COLOR_BGR2RGB)
     processed_image = SIFT(foreground,  background)
+    
 
     return processed_image
 
