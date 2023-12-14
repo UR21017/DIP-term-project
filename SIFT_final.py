@@ -9,26 +9,10 @@ import glob
 # 图片路径列表
 folder_path = "./linear_interpolation/img2/"
 image_paths = glob.glob(f"{folder_path}*.jpg")
-
-# image_paths = ["./linear_interpolation/img2/1.jpg", "./linear_interpolation/img2/2.jpg", "./linear_interpolation/img2/3.jpg", "./linear_interpolation/img2/4.jpg", "./linear_interpolation/img2/5.jpg"]
 current_image_index = 0  # 当前显示的图片索引
 
 
-
-
 MIN_MATCH_COUNT = 10
-
-foreground_path = "./linear_interpolation/img2/1.jpg"
-# middleground_path = "./linear_interpolation/img/2-2.jpg"
-background_path = "./linear_interpolation/img2/2.jpg"
-
-foreground = cv2.imread(foreground_path, cv2.IMREAD_GRAYSCALE)
-# middleground = cv2.imread(middleground_path)
-background = cv2.imread(background_path, cv2.IMREAD_GRAYSCALE)
-
-# cv2.imshow("origin", img)
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
 
 def SIFT(foreground, background):
 
@@ -88,37 +72,70 @@ def SIFT(foreground, background):
 
 
 
-def load_image(index):
+def load_image(standand, targetImage):
     # 加载图像并进行处理（例如，转换为灰度）
-    image_path = image_paths[index]
-    background = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    foreground = cv2.imread(standand, cv2.IMREAD_GRAYSCALE)
+    background = cv2.imread(targetImage, cv2.IMREAD_GRAYSCALE)
     
-    foreground = cv2.imread(image_paths[0], cv2.IMREAD_GRAYSCALE)
     
     # processed_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
     processed_image = SIFT(foreground,  background)
 
     return processed_image
 
+def calculate_image_quality(image):
+    return np.var(cv2.Laplacian(image, cv2.CV_64F))
+
+def find_best_focus_image(directory, click_x, click_y, window_size=50):
+    best_quality = -1
+    best_image_path = ""
+
+    for image in directory:
+  
+        x= max(0, int(click_x) - window_size)
+        y = max(0,int(click_y) - window_size)
+
+        
+
+        window = image[y:min(y + window_size * 2, image.shape[0]), x:min(x + window_size * 2, image.shape[1])]
+
+        quality = calculate_image_quality(window)
+
+        if quality > best_quality:
+            best_quality = quality
+            best_image = image
+
+    return best_image
+
+
 def on_click(event):
     if event.button is MouseButton.LEFT:
-        global current_image_index
+        global click_x, click_y
 
-        # 切换到下一张图片
-        current_image_index = (current_image_index + 1) % len(image_paths)
+        click_x, click_y = event.xdata, event.ydata
+
+        best_image = find_best_focus_image(directory, click_x, click_y)
 
         # 更新显示的图像
         ax.clear()
-        ax.imshow(load_image(current_image_index), cmap='gray')  # 指定cmap为'gray'
-        ax.set_title(f"Image {current_image_index + 1}")
-
+        ax.imshow(best_image, cmap='gray')  # 指定cmap为'gray'
+        # ax.set_title(f"Image {current_image_index + 1}")
         # 刷新图形
         plt.draw()
 
+
+
+directory = []
+
+for image_path in image_paths:
+
+    directory.append(load_image(image_paths[0], image_path))
+    # cv2.imshow("result",load_image(image_paths[0], image_path))
+    # cv2.waitKey(0)
+
 # 创建初始图形
 fig, ax = plt.subplots()
-ax.imshow(load_image(current_image_index), cmap='gray')  # 指定cmap为'gray'
-ax.set_title(f"Image {current_image_index + 1}")
+ax.imshow(directory[0], cmap='gray')  # 指定cmap为'gray'
 
 # 将鼠标点击事件连接到更新图像的函数
 plt.connect('button_press_event', on_click)
