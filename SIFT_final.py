@@ -140,5 +140,7 @@ ax.imshow(directory[0], cmap='gray')  # 指定cmap为'gray'
 # 将鼠标点击事件连接到更新图像的函数
 plt.connect('button_press_event', on_click)
 
+manager = plt.get_current_fig_manager()
+manager.full_screen_toggle()
 # 显示图形
 plt.show()
