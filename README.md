@@ -1,32 +1,26 @@
 # Seamless Refocusing
 
-原本在切換由近至遠對焦的圖片時，看起來整體縮小，切換由遠至近的對焦的圖片，看起來則是整體放大。透過以下程式，可以達到切換焦點時不會產生縮放的效果。
-使用SIFT算法進行圖像對齊和焦點合併。該腳本可以加載一系列圖片，通過點擊其中一張圖片選擇感興趣區域，然後找到其他圖片中對應區域的最佳焦點，最終生成一張合併後的圖像。
+此程式使用SIFT算法進行圖像對齊和焦點合併，可以輸入一組焦點不同的圖片，透過點擊圖片中感興趣區域，找到其他圖片中對應區域的最佳焦點。達到切換焦點時，視覺上不會感受到圖片縮放的效果。
 - [成果](https://youtu.be/qVbRndE4l4c)
+
+## 題目說明
+Allowing the change of focal point while browsing a photo is an attractive feature for smartphone users because it avoids reshooting the photo. Focal-stack refocusing is an appropriate approach to implement such a feature for your smartphone. It takes a sequence of photos (the focal stack) of a scene by sweeping the lens and selects from the focal stack the sharpest photo corresponding to the focal point specified by the user. However, switching from one focal point to another may cause an annoying radial expansion or contraction to the displayed photos. The goal of this term project is to resolve the expansion/contraction issue by designing an effective and efficient algorithm.
+> 由近至遠對焦:圖片逐漸縮小
+![由近至遠對焦:圖片逐漸縮小](https://github.com/UR21017/DIP-term-project/blob/main/images%20(1).gif)
+> 由遠至近對焦:圖片逐漸放大
+![由遠至近對焦:圖片逐漸放大](https://github.com/UR21017/DIP-term-project/blob/main/images%20(2).gif)
 
 ## 使用方法
 1. 將待處理的圖片放入指定文件夾（默認為"./pictures/"）中，圖片格式應為JPEG格式。
 2. 運行腳本，點擊要選擇感興趣區域的圖片上的目標區域（左鍵點擊）。
 3. 程序會自動在其他圖片中找到相似區域的最佳焦點，並將合併後的圖像顯示出來。
 
-## 畫面
-
-> 可提供 1~3 張圖片，讓觀看者透過 README 了解整體畫面
-
-![範例圖片 1](https://github.com/UR21017/DIP-term-project/blob/main/pictures/picture1.jpg)
-![範例圖片 2][(https://fakeimg.pl/500/)](https://youtu.be/qVbRndE4l4c)
-
 ## 安裝
-
-> 請務必依據你的專案來調整內容。
-
-確保安裝了以下Python庫：
-
 - matplotlib
 - numpy
 - opencv-python
 
-### 函數說明
+## 函數說明
 `SIFT(foreground, background)`
 使用SIFT算法進行圖像匹配和對齊。在足夠匹配點的情況下，計算圖像變換矩陣，然後通過透視變換將背景圖像中的區域與前景圖像對齊。
 
