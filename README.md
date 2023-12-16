@@ -1,6 +1,7 @@
 # Seamless Refocusing
 
-這是一個使用SIFT算法進行圖像對齊和焦點合併的Python腳本。該腳本可以加載一系列圖片，通過點擊其中一張圖片選擇感興趣區域，然後找到其他圖片中對應區域的最佳焦點，最終生成一張合併後的圖像。
+原本在切換由近至遠對焦的圖片時，看起來整體縮小，切換由遠至近的對焦的圖片，看起來則是整體放大。透過以下程式，可以達到切換焦點時不會產生縮放的效果。
+使用SIFT算法進行圖像對齊和焦點合併。該腳本可以加載一系列圖片，通過點擊其中一張圖片選擇感興趣區域，然後找到其他圖片中對應區域的最佳焦點，最終生成一張合併後的圖像。
 - [成果](https://youtu.be/qVbRndE4l4c)
 
 ## 使用方法
@@ -12,7 +13,7 @@
 
 > 可提供 1~3 張圖片，讓觀看者透過 README 了解整體畫面
 
-![範例圖片 1]([https://fakeimg.pl/500/](https://youtu.be/qVbRndE4l4c))
+![範例圖片 1](https://github.com/UR21017/DIP-term-project/blob/main/pictures/picture1.jpg)
 ![範例圖片 2][(https://fakeimg.pl/500/)](https://youtu.be/qVbRndE4l4c)
 
 ## 安裝
