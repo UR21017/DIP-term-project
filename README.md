@@ -1,7 +1,7 @@
 # Seamless Refocusing
 
 此程式使用SIFT算法進行圖像對齊和焦點合併，可以輸入一組焦點不同的圖片，透過點擊圖片中感興趣區域，找到其他圖片中對應區域的最佳焦點。達到切換焦點時，視覺上不會感受到圖片縮放的效果。
-- [成果](https://youtu.be/qVbRndE4l4c)
+- [成果](https://youtu.be/IJC7GbT9xuE)
 
 ## 題目說明
 Allowing the change of focal point while browsing a photo is an attractive feature for smartphone users because it avoids reshooting the photo. Focal-stack refocusing is an appropriate approach to implement such a feature for your smartphone. It takes a sequence of photos (the focal stack) of a scene by sweeping the lens and selects from the focal stack the sharpest photo corresponding to the focal point specified by the user. However, switching from one focal point to another may cause an annoying radial expansion or contraction to the displayed photos. The goal of this term project is to resolve the expansion/contraction issue by designing an effective and efficient algorithm.
