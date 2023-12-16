@@ -6,9 +6,7 @@
 ## 題目說明
 Allowing the change of focal point while browsing a photo is an attractive feature for smartphone users because it avoids reshooting the photo. Focal-stack refocusing is an appropriate approach to implement such a feature for your smartphone. It takes a sequence of photos (the focal stack) of a scene by sweeping the lens and selects from the focal stack the sharpest photo corresponding to the focal point specified by the user. However, switching from one focal point to another may cause an annoying radial expansion or contraction to the displayed photos. The goal of this term project is to resolve the expansion/contraction issue by designing an effective and efficient algorithm.
 > 由近至遠對焦:圖片逐漸縮小
-![由近至遠對焦:圖片逐漸縮小](https://github.com/UR21017/DIP-term-project/blob/main/images%20(1).gif)
-> 由遠至近對焦:圖片逐漸放大
-![由遠至近對焦:圖片逐漸放大](https://github.com/UR21017/DIP-term-project/blob/main/images%20(2).gif)
+![由近至遠對焦:圖片逐漸縮小](https://github.com/UR21017/DIP-term-project/blob/main/images%20(2).gif)
 
 ## 使用方法
 1. 將待處理的圖片放入指定文件夾（默認為"./pictures/"）中，圖片格式應為JPEG格式。
