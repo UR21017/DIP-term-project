@@ -33,3 +33,7 @@ Allowing the change of focal point while browsing a photo is an attractive featu
 
 `on_click(event)`
 點擊事件處理函數，當左鍵點擊時，獲取點擊坐標並調用find_best_focus_image函數，然後在Matplotlib圖形中顯示最佳焦點圖像。
+
+## 參考資料
+- [SIFT原理](https://zh.wikipedia.org/zh-tw/%E5%B0%BA%E5%BA%A6%E4%B8%8D%E8%AE%8A%E7%89%B9%E5%BE%B5%E8%BD%89%E6%8F%9B)
+- [Feature Matching + Homography to find objects](https://docs.opencv.org/3.4/d1/de0/tutorial_py_feature_homography.html)
