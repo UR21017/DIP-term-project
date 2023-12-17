@@ -11,10 +11,11 @@ Allowing the change of focal point while browsing a photo is an attractive featu
 
 ## 使用方法
 1. 將待處理的圖片放入指定文件夾（"./pictures/"）中，圖片格式應為JPEG格式。
-2. 執行程式，點擊圖片上的目標區域。
-3. 程式會自動在其他圖片中找到相似區域的最佳焦點，並顯示出來。
+2. 安裝套件
+3. 執行程式，點擊圖片上的目標區域。
+4. 程式會自動在其他圖片中找到相似區域的最佳焦點，並顯示出來。
 
-## 安裝
+## 套件安裝
 ```bash
 pip install numpy
 ```
