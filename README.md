@@ -34,7 +34,7 @@ pip install matplotlib
 使用SIFT算法進行圖像匹配和對齊。在足夠匹配點的情況下，計算圖像變換矩陣，然後通過透視變換將背景圖像中的區域與前景圖像對齊。
 
 `on_click(event)`
-點擊事件處理函數，當左鍵點擊時，獲取點擊坐標並調用find_best_focus_image函數，在Matplotlib圖形中顯示最佳焦點圖像。
+點擊事件處理函數。當左鍵點擊時，得到點擊坐標並調用find_best_focus_image函數，在Matplotlib圖形中顯示最佳焦點圖像。
 
 `calculate_image_quality(image)`
 使用Variance of Laplacian作為圖像清晰度的指標，計算以點擊座標為中心的window範圍清晰度來評估焦點。
